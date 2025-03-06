@@ -1,48 +1,50 @@
 package com.EmployeePayroll.EmployeePayRoll.Controller;
 
-import com.EmployeePayroll.EmployeePayRoll.DTO.EmployeeDTO;
 import com.EmployeePayroll.EmployeePayRoll.Model.Employee;
-import com.EmployeePayroll.EmployeePayRoll.Repository.EmployeeRepository;
-import lombok.Data;
+import com.EmployeePayroll.EmployeePayRoll.Service.EmployeeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/employees")
 public class EmployeeController {
-private final EmployeeRepository employeeRepository;
-public EmployeeController(EmployeeRepository employeeRepository){
-    this.employeeRepository=employeeRepository;
-}
-@GetMapping()
-    public List<Employee> getAllEmployees(){
-    return employeeRepository.findAll();
-}
-@GetMapping("/{id}")
-    public Employee getById(@PathVariable Long id){
-    return employeeRepository.findById(id).orElse(null);
-}
-    @PostMapping
-    public Employee createEmployee(@RequestBody EmployeeDTO employeeDTO) {
-        Employee employee = new Employee();
-        employee.setName(employeeDTO.getName());
-        employee.setSalary(employeeDTO.getSalary());
-        return employeeRepository.save(employee);
+    private final EmployeeService employeeService;
+
+    @Autowired
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
     }
 
-@PutMapping("/{id}")
-    public Employee updateEmployee(@PathVariable Long id, @RequestBody Employee updatedEmployee){
-    return employeeRepository.findById(id).map(employee -> {
-        employee.setName(updatedEmployee.getName());
-        employee.setDepartment(updatedEmployee.getDepartment());
-        employee.setSalary(updatedEmployee.getSalary());
-        return employeeRepository.save(employee);
-    }).orElse(null);
-}
+    // GET: Fetch all employees
+    @GetMapping
+    public List<Employee> getAllEmployees() {
+        return employeeService.getAllEmployees();
+    }
 
-@DeleteMapping("/{id}")
-    public void deleteEmployee(@PathVariable Long id){
-    employeeRepository.deleteById(id);
-}
+    // GET: Fetch employee by ID
+    @GetMapping("/{id}")
+    public Optional<Employee> getEmployeeById(@PathVariable Long id) {
+        return employeeService.getEmployeeById(id);
+    }
+
+    // POST: Add a new employee
+    @PostMapping
+    public Employee createEmployee(@RequestBody Employee employee) {
+        return employeeService.createEmployee(employee);
+    }
+
+    // PUT: Update an employee
+    @PutMapping("/{id}")
+    public Optional<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee updatedEmployee) {
+        return employeeService.updateEmployee(id, updatedEmployee);
+    }
+
+    // DELETE: Remove an employee
+    @DeleteMapping("/{id}")
+    public void deleteEmployee(@PathVariable Long id) {
+        employeeService.deleteEmployee(id);
+    }
 }
