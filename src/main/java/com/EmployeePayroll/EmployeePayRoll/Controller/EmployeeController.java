@@ -1,5 +1,6 @@
 package com.EmployeePayroll.EmployeePayRoll.Controller;
 
+import com.EmployeePayroll.EmployeePayRoll.DTO.EmployeeDTO;
 import com.EmployeePayroll.EmployeePayRoll.Model.Employee;
 import com.EmployeePayroll.EmployeePayRoll.Repository.EmployeeRepository;
 import lombok.Data;
@@ -22,10 +23,14 @@ public EmployeeController(EmployeeRepository employeeRepository){
     public Employee getById(@PathVariable Long id){
     return employeeRepository.findById(id).orElse(null);
 }
-@PostMapping
-public Employee createEmployee(@RequestBody Employee employee){
-    return employeeRepository.save(employee);
-}
+    @PostMapping
+    public Employee createEmployee(@RequestBody EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        employee.setName(employeeDTO.getName());
+        employee.setSalary(employeeDTO.getSalary());
+        return employeeRepository.save(employee);
+    }
+
 @PutMapping("/{id}")
     public Employee updateEmployee(@PathVariable Long id, @RequestBody Employee updatedEmployee){
     return employeeRepository.findById(id).map(employee -> {
